@@ -52,7 +52,7 @@
 					this.score_one = 10
 					this.score_count = 0
 					this.score_total = 0
-				        this.body = ['83','58']
+					this.body = ['83','58']
 					this.head = 108
 					this.time = 120
 					this.food = null
@@ -77,9 +77,9 @@
 			
 			var FoodCreat = () => {
 				let Random = () => {return Math.floor(Math.random() * Type.size.width * Type.size.height + 1) + 1 + ""}
-				food = Random()
-				while(food == data.head + "" || data.body.includes(food)){food = Random()}
-				$("div#"+ food +"").css(Type.FoodType)
+				data.food = Random()
+				while(data.food == data.head + "" || data.body.includes(data.food)){data.food = Random()}
+				$("div#"+ data.food +"").css(Type.FoodType)
 			}
 			
 			var SnakeCreat = () => {
@@ -160,12 +160,12 @@
 					$("div#mainmap").empty()
 					clearInterval(timer)
 					Reboot()
-				}else if(headString == food){
+				}else if(headString == data.food){
 					$("div[id = "+ oldheadString +"]").css(Type.bodyType)
 					data.body = [oldheadString].concat(data.body)
 					data.score_total += data.score_one
 					data.score_count += 1
-					if(data.score_count % 10 == 0  && data.time > 30){data.score_one += 10;data.time -= 10;clearInterval(timer);SnakeMove()}
+					if(data.score_count % 2 == 0  && data.time > 30){data.score_one += 10;data.time -= 90;clearInterval(timer);SnakeMove()}
 					FoodCreat()
 				}else{
 					$("div[id = "+ data.body[data.body.length - 1] +"]").css(Type.None)
