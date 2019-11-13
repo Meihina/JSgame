@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="jquery-3.4.1.js" type="text/javascript" charset="UTF-8"></script>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			
+			.mapdiv{
+				float: left;
+				width: 20px;
+				height: 20px;
+				box-sizing: border-box;
+				border-style:solid;
+				border-width:0.03px;
+				border-color: darkgray;
+			}
+			
+			#mainmap{
+				width: 500px;
+				height: 500px;
+				margin:50px auto;
+				border-style:solid;
+				border-width:1px;
+				border-color: darkgray;
+			}
+			
+			#setsumei{
+				text-align:center;
+			}
+		</style>
+	</head>
+	<body>
+		<br><div id="setsumei">按任意方向键开始，方向键为 w/s/a/d</div>
+		<div id="mainmap"></div>
+
+		<script>
+			const Type = {
+				size : {width : 25 ,height : 25},
+				bodyType : {"background":"dimgrey","border-color": "dimgrey"},
+				headType : {"background":"black","border-color": "black"},
+				FoodType : {"background":"yellow","border-color": "darkgray"},
+				None : {"background":"white","border-color": "darkgray"}
+			}
+			
+			class BeginData{
+				constructor() {
+					this.score_one = 10
+					this.score_count = 0
+					this.score_total = 0
+				    this.body = ['83','58']
+					this.head = 108
+					this.food = null
+					this.direct = null
+					this.lastdirect = null
+					this.headDiv = null
+					this.Step = null
+				}
+			}
+			
+			let timer = null
+			let time = 120
+			let data = new BeginData()
+			
+			var MapCreat = () => {
+				for(let i = 0 ; i < Type.size.width * Type.size.height ; i++){
+					let Lbox = $("<div class=\"mapdiv\"></div>")
+					Lbox.attr('id',i+1)
+					$("div#mainmap").append(Lbox)  //添加元素
+				}
+				FoodCreat()
+			}
+			
+			var FoodCreat = () => {
+				let Random = () => {return Math.floor(Math.random() * Type.size.width * Type.size.height + 1) + 1 + ""}
+				food = Random()
+				while(food == data.head + "" || data.body.includes(food)){food = Random()}
+				$("div#"+ food +"").css(Type.FoodType)
+			}
+			
+			var SnakeCreat = () => {
+				data.headDiv = $("div[id = "+ data.head + "" +"]").css(Type.headType)
+				$.map(data.body,(value,index) => {$("div[id = "+ value +"]").css(Type.bodyType)})
+				data.head = parseInt(data.headDiv.attr("id"))
+			}
+			
+			var SnakeDirect = () => {
+				$(window).keypress(function(event){
+					data.direct = event.keyCode
+				});
+			}
+			
+			var SnakeMove = () => {
+				timer = setInterval(function(){
+					if(data.direct == 119 && data.lastdirect == 115){data.direct = 115}
+					if(data.direct == 115 && data.lastdirect == 119){data.direct = 119}
+					if(data.direct == 97 && data.lastdirect == 100){data.direct = 100}
+					if(data.direct == 100 && data.lastdirect == 97){data.direct = 97}
+					switch(data.direct){
+						case 119:  //w
+						data.Step = -25
+						SnakeGO(data.Step)
+						data.lastdirect = data.direct
+						break;
+						
+						case 115:  //s
+						data.Step = 25
+						SnakeGO(data.Step)
+						data.lastdirect = data.direct
+						break;
+						
+						case 97:  //a
+						data.Step = -1
+						SnakeGO(data.Step)
+						data.lastdirect = data.direct
+						break;
+						
+						case 100:  //d
+						data.Step = 1
+						SnakeGO(data.Step)
+						data.lastdirect = data.direct
+						break;
+					}
+				},time)
+			}
+			
+			var SnakeGO = (step) => {
+				let oldhead = data.head
+				let oldheadString = oldhead + ""
+				let headString = data.head + ""
+				
+				if(data.head % 25 == 0 && data.direct == 100){
+					$("div[id = "+ headString +"]").css(Type.None)
+					data.head -= 24
+					$("div[id = "+ headString +"]").css(Type.headType)
+				}else if(data.head % 25 == 1 && data.direct == 97){
+					$("div[id = "+ headString +"]").css(Type.None)
+					data.head += 24
+					$("div[id = "+ headString +"]").css(Type.headType)
+				}else if(data.head < 26 && data.direct == 119){
+					$("div[id = "+ headString +"]").css(Type.None)
+					data.head += 600
+					$("div[id = "+ headString +"]").css(Type.headType)
+				}else if(data.head > 600 && data.direct == 115){
+					$("div[id = "+ headString +"]").css(Type.None)
+					data.head -= 600
+					$("div[id = "+ headString +"]").css(Type.headType)
+				}else{
+					$("div[id = "+ data.head + "" +"]").css(Type.None)
+					data.head = data.head + step
+					$("div[id = "+ data.head + "" +"]").css(Type.headType)
+				}
+				
+				if (data.body.includes(headString)){
+					alert('你去世了,一共'+ data.score_total +'分')
+					$("div#mainmap").empty()
+					clearInterval(timer)
+					Reboot()
+				}else if(headString == food){
+					$("div[id = "+ oldheadString +"]").css(Type.bodyType)
+					data.body = [oldheadString].concat(data.body)
+					data.score_total += data.score_one
+					data.score_count += 1
+					if(data.score_count % 10 == 0  && time > 30){data.score_one += 10;time -= 10;clearInterval(timer);SnakeMove()}
+					FoodCreat()
+				}else{
+					$("div[id = "+ data.body[data.body.length - 1] +"]").css(Type.None)
+					$("div[id = "+ oldheadString +"]").css(Type.bodyType)
+					data.body = [oldheadString].concat(data.body)
+					data.body.pop()
+				}
+			}
+			
+			var Reboot = () => {
+				data = new BeginData()
+				MapCreat()
+				SnakeCreat()
+				SnakeDirect()
+				SnakeMove()
+			}
+			
+			MapCreat()
+			SnakeCreat()
+			SnakeDirect()
+			SnakeMove()
+			
+		</script>
+	</body>
+</html>
