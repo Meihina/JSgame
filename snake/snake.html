@@ -54,6 +54,7 @@
 					this.score_total = 0
 				        this.body = ['83','58']
 					this.head = 108
+					this.time = 120
 					this.food = null
 					this.direct = null
 					this.lastdirect = null
@@ -63,7 +64,6 @@
 			}
 			
 			let timer = null
-			let time = 120
 			let data = new BeginData()
 			
 			var MapCreat = () => {
@@ -125,7 +125,7 @@
 						data.lastdirect = data.direct
 						break;
 					}
-				},time)
+				},data.time)
 			}
 			
 			var SnakeGO = (step) => {
@@ -165,7 +165,7 @@
 					data.body = [oldheadString].concat(data.body)
 					data.score_total += data.score_one
 					data.score_count += 1
-					if(data.score_count % 10 == 0  && time > 30){data.score_one += 10;time -= 10;clearInterval(timer);SnakeMove()}
+					if(data.score_count % 10 == 0  && data.time > 30){data.score_one += 10;data.time -= 10;clearInterval(timer);SnakeMove()}
 					FoodCreat()
 				}else{
 					$("div[id = "+ data.body[data.body.length - 1] +"]").css(Type.None)
