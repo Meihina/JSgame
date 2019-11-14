@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title></title>
-		<script src="jquery-3.4.1.js" type="text/javascript" charset="UTF-8"></script>
+		<script src="http://lib.sinaapp.com/js/jquery/2.0.2/jquery-2.0.2.min.js"></script>
 		<style type="text/css">
 			*{
 				margin: 0;
@@ -17,7 +17,7 @@
 				box-sizing: border-box;
 				border-style:solid;
 				border-width:0.03px;
-				border-color: darkgray;
+				border-color: white;
 			}
 			
 			#mainmap{
@@ -25,7 +25,7 @@
 				height: 500px;
 				margin:50px auto;
 				border-style:solid;
-				border-width:1px;
+				border-width:5px;
 				border-color: darkgray;
 			}
 			
@@ -35,7 +35,8 @@
 		</style>
 	</head>
 	<body>
-		<br><div id="setsumei">按任意方向键开始，方向键为 w/s/a/d</div>
+		<br><div id="setsumei">按任意方向键开始，方向键为 w/s/a/d
+		<br><p>当前得分：0</p></div>
 		<div id="mainmap"></div>
 
 		<script>
@@ -43,8 +44,8 @@
 				size : {width : 25 ,height : 25},
 				bodyType : {"background":"dimgrey","border-color": "dimgrey"},
 				headType : {"background":"black","border-color": "black"},
-				FoodType : {"background":"yellow","border-color": "darkgray"},
-				None : {"background":"white","border-color": "darkgray"}
+				FoodType : {"background":"yellow","border-color": "yellow"},
+				None : {"background":"white","border-color": "white"}
 			}
 			
 			class BeginData{
@@ -165,6 +166,9 @@
 					data.body = [oldheadString].concat(data.body)
 					data.score_total += data.score_one
 					data.score_count += 1
+					$("p").html(function(){
+						return "当前得分：" + data.score_total
+					})
 					if(data.score_count % 10 == 0  && data.time > 30){data.score_one += 10;data.time -= 10;clearInterval(timer);SnakeMove()}
 					FoodCreat()
 				}else{
